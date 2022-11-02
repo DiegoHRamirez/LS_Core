@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Add Schedules</title>
+    <meta charset="utf-8" />
+    <style>
+      .form {
+        display: block;
+        padding: 5px;
+        border: 2px solid black;
+        margin-bottom: 5px;
+      }
+
+      form input {
+        display: inline-block;
+        margin-bottom: 2px;
+      }
+
+      form button {
+        height: 60px;
+        width: 100px;
+        background: orange;
+        display: block;
+        font: 25px Arial, sans-serif;
+      }
+
+      #signup {
+        display: none;
+      }
+
+      #add {
+        height: 60px;
+        width: 100px;
+        color: white;
+        background: blue;
+        display: block;
+        font: 15px Arial, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='form'>
+      <form>
+          <label>Please Select a schedule </label>
+          <select name="id">
+          </select><br>
+          <label>Email</label>
+          <input name='student_email' placeholder='example@email.com'><br>
+        <button type='submit'>submit</button>
+      </form>
+    </div>
+
+    <div id='signup', class='form'>
+      <form>
+        <h1>Please provide new student details</h1>
+        <label>email</label>
+        <input name='email'/><br>
+
+        <label>Name:</label>
+        <input name='name' placeholder='name'><br>
+
+        <label>Booking Sequence: </label>
+        <input name='booking_sequence' type="number">
+
+        <button>Submit</button>
+      </form>
+    </div>
+  </body>
+  <script>
+    /*
+    have a selection with all the available schedules
+
+    have an email input
+
+retrieve all the schedules from the
+  - GET /api/schedules
+  - retrieve the collection of schedule objects
+  - loop over each one, create an option element, etc etc
+
+
+to book a schedule you:
+  - GET api/bookings
+  params:
+    id: number (id of the schedule)
+    student_email
+
+
+    */
+    function getJsonData(url) {
+      let xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.responseType = 'json';
+      xhr.send();
+      return xhr;
+    }
+
+    let loadStaff = getJsonData('api/staff_members');
+    let loadSchedules = getJsonData('api/schedules');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let form = document.querySelector('form');
+      let signUp = document.querySelector('#signup');
+      let signUpForm = signUp.querySelector('form');
+      let scheduleSelection = form.querySelector('select');
+      let staff;
+
+      function createScheduleSelection(schedule) {
+        let option = document.createElement('option');
+        let staffName = staff.find(staff => staff.id === schedule.staff_id).name;
+        option.textContent = staffName + ' | ' + schedule.date + ' | ' + schedule.time;
+        option.value = schedule.id;
+        scheduleSelection.appendChild(option);
+      }
+
+      function showSignUpForm(seqNum) {
+        let email = document.querySelector('input[name=student_email]').value;
+        signUp.style.display = 'block';
+
+        let emailInput = document.querySelector('input[name=email]');
+        let bookingInput = document.querySelector('input[name=booking_sequence]');
+
+        emailInput.value = email;
+        bookingInput.value = +seqNum;
+      }
+
+      function submitBookingForm(event) {
+        !event || event.preventDefault();
+        let data = new FormData(form);
+        let xhr = new XMLHttpRequest();
+
+        xhr.open('POST', 'api/bookings');
+        xhr.send(data);
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 204) {
+            alert('Booked');
+            let selected = form.querySelector('select').selectedIndex;
+            [...form.querySelectorAll('select option')].find((_, idx) => idx === selected).remove();
+            form.reset();
+          } else {
+            alert(xhr.response);
+            let bookingSequence = xhr.response.match(/\d+/)[0];
+            showSignUpForm(bookingSequence);
+          }
+        });
+      }
+
+      loadStaff.addEventListener('load', () => staff = loadStaff.response);
+      loadSchedules.addEventListener('load', () => {
+        let available = loadSchedules.response.filter(schedule => !schedule.student_email);
+        available.forEach(createScheduleSelection);
+      })
+
+      form.addEventListener('submit', submitBookingForm);
+      signUpForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        let data = new FormData(this);
+        let xhr = new XMLHttpRequest();
+
+        xhr.open('POST', 'api/students');
+        xhr.send(data);
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 201) {
+            alert(xhr.responseText);
+            submitBookingForm();
+            this.reset();
+            signUp.style.display = 'none';
+          } else {
+            alert(xhr.response);
+          }
+        });
+      });
+    });
+
+
+
+  </script>
+</html>

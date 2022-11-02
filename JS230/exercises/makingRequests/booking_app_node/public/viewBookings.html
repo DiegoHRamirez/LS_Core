@@ -1,0 +1,114 @@
+<html lang="en">
+  <head>
+    <title>Add Schedules</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <h1>Bookings</h1>
+    <ul id='bookings'>
+    </ul>
+  </body>
+  <script>
+    /*
+    viewing bookings
+    implement the markup and JS to view bookings made by students
+
+    2 levels of detail
+    - list of dates with booking
+
+    -2nd level becomes visible only when a date is clicked and shows a nested
+    list of booking details
+      - staff name
+      - student email
+      - time booked
+
+
+    ul element
+    - li elements representing the dates that are booked
+      once li elements are clicked
+        - the specifics should become visible
+
+    make a request to the api to retrieve all dates with booked schedules
+      - make an xhr request
+        - GET /api/bookings
+        - returns an arr of dates that are booked
+
+        - iterate over resulting arr, add a list item to the the ul
+        - add an unordered list to each li item
+          - within this unorderd list will be placed the booking details
+          - make the unorderd list invisible
+
+        - as you iterate over date
+          - retrieve booking details for each date
+          - GET /api/bookings/date
+          - returns an arr with the booking details
+          - iterate over the arr
+            - at each booking arr,
+            - join the arr with  ' | '
+            - add the joined string as a li item to the ul under the curren booking data li
+
+    */
+    let loadDates = new XMLHttpRequest();
+    loadDates.open('GET', '/api/bookings');
+    loadDates.responseType = 'json';
+    loadDates.send();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let bookings = document.getElementById('bookings');
+
+      function addDate(date) {
+        let details = document.createElement('ul');
+        let li = document.createElement('li');
+
+        details.style.display = 'none';
+        li.textContent = date;
+
+        li.appendChild(details);
+        bookings.appendChild(li);
+      }
+
+      function findDate(date) {
+        let dates = [...bookings.children];
+        return dates.find(bookingDate => bookingDate.textContent === date);
+      }
+
+      function addBookingDetails(date, details) {
+        let ul = date.firstElementChild;
+
+        details.forEach(detail => {
+          let li = document.createElement('li');
+          li.textContent = detail.join(' | ');
+          ul.appendChild(li);
+        });
+      }
+
+      function getBookingsFor(date) {
+        let loadBookings = new XMLHttpRequest();
+        loadBookings.responseType = 'json';
+        loadBookings.open('GET', `/api/bookings/${date}`);
+        loadBookings.send();
+
+        loadBookings.addEventListener('load', () => {
+          let dateItem = findDate(date);
+          addBookingDetails(dateItem, loadBookings.response);
+        })
+      }
+
+      loadDates.addEventListener('load', () => {
+        loadDates.response.forEach(date => {
+          addDate(date);
+          getBookingsFor(date);
+        })
+      });
+
+      bookings.addEventListener('click', function(event) {
+        if (event.target.tagName === 'LI') {
+          let bookingDetails = event.target.firstElementChild;
+          if (bookingDetails.style.display === 'none') {
+            bookingDetails.style.display = '';
+          }
+        }
+      });
+    });
+  </script>
+</html>

@@ -1,0 +1,67 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <p> TESTING</p>
+    <form method="POST" action="/api">
+      <section>
+        <label>Email: </label>
+        <input name='email'>
+        <br>
+        <label>Name: </label>
+        <input name='name'>
+      </section>
+      <br>
+      <button>submit</button>
+    </form>
+  </body>
+  <script>
+    /*
+      Adding a staff memeber: POST /api/staff_members?name=value&email=value
+      - if succeeds, returns a 201, and an object with the id of the created staff member
+      - if it fails, sends an error 4xx
+
+      steps:
+      make an XHR
+      set its method to post, url
+
+
+      add an event listener to the form
+      - on submit
+        set the appropriate content-type x-www...
+        serialize the data with FormData
+
+
+        if 201 responst status,
+          - alert (successfully created staff with id: id)
+
+        handler a form error, alert user 'Staff can not be created check input'
+    */
+    document.addEventListener('DOMContentLoaded', () => {
+      let form = document.querySelector('form');
+      let inputName = form.querySelector('[name=name]');
+      let inputEmail = form.querySelector('[name=email]');
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        let data = new FormData(form);
+        let request = new XMLHttpRequest();
+
+        request.open('POST', '/api/staff_members')
+
+        request.addEventListener('load', event => {
+          if (request.status === 201) {
+            let id = JSON.parse(request.response).id;
+            alert(`Staff successfully created with id: ${id}`)
+          } else {
+            alert(request.responseText)
+          }
+        })
+
+        request.send(data);
+      })
+
+    });
+  </script>
+</html>

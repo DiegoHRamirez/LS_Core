@@ -1,0 +1,85 @@
+<html lang="en">
+  <head>
+    <title>Cancel</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <p> Cancel Schedule</p>
+    <form id='schedule' method="POST" action="">
+      <section>
+        <label>Schedule id: </label>
+        <input name='schedule_id' type='number'>
+      </section>
+      <br>
+      <button>submit</button>
+    </form>
+
+    <p> Cancel Booking</p>
+    <form id='booking' method="POST" action="">
+      <section>
+        <label>Booking id: </label>
+        <input name='booking_id' type='number'>
+      </section>
+      <br>
+      <button>submit</button>
+    </form>
+    <script>
+      document.addEventListener('DOMContentLoaded', function(event) {
+        let booking = document.getElementById('booking');
+        let schedule = document.getElementById('schedule');
+
+
+        function cancel(event, form, method, url) {
+          event.preventDefault()
+
+          let xhr = new XMLHttpRequest();
+
+          xhr.open(method, url + form[`${form.id}_id`].value);
+          xhr.send();
+
+          xhr.addEventListener('load', () => {
+            if (xhr.status === 204) {
+              alert(`${form.id} cancelled`)
+            } else {
+              alert(`Cancelling Failed: ${xhr.responseText}`)
+            }
+          });
+        }
+
+        booking.addEventListener('submit', e => {
+          cancel(e, booking, 'PUT', '/api/bookings/');
+        });
+
+        schedule.addEventListener('submit', e => {
+          cancel(e, schedule, 'DELETE', 'api/schedules/');
+        })
+      });
+
+
+      /*
+      implement 2 functions:
+        - staff Cancels schedule
+          - DELETE api/schedules/schedule_id
+
+        - student cancels booking
+          - PUT /api/bookings/booking_id
+            - takes booking_id
+
+        function cancelSchedule(schedule_id);
+          - new xhr
+          - DELETE, /api/schedules/id
+          - send xhr
+
+        function cancelBooking(id)
+          - new xhr
+          - PUT, /api.schedules/id
+          - send xhr
+
+          should we handle errors?
+        }
+
+        wait for document to load, when form is submitted, etc.
+      */
+    </script>
+  </body>
+</html>

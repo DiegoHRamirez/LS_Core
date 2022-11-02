@@ -1,0 +1,24 @@
+
+[1mFrom:[0m /home/ec2-user/rb101/small_problems/medium_1/6.rb:9 Object#minilang:
+
+     [1;34m3[0m: [32mdef[0m [1;34mminilang[0m(string)
+     [1;34m4[0m:   stack = []
+     [1;34m5[0m:   reg_val = [1;34m0[0m
+     [1;34m6[0m: 
+     [1;34m7[0m:   string.split.each [32mdo[0m |cmd|
+     [1;34m8[0m:     binding.pry
+ =>  [1;34m9[0m:       [32mcase[0m cmd
+    [1;34m10[0m:       [32mwhen[0m [31m[1;31m'[0m[31mPUSH[1;31m'[0m[31m[0m [32mthen[0m stack.push(reg_val)
+    [1;34m11[0m:       [32mwhen[0m [31m[1;31m'[0m[31mADD[1;31m'[0m[31m[0m [32mthen[0m reg_val += stack.pop
+    [1;34m12[0m:       [32mwhen[0m [31m[1;31m'[0m[31mSUB[1;31m'[0m[31m[0m [32mthen[0m reg_val -= stack.pop
+    [1;34m13[0m:       [32mwhen[0m [31m[1;31m'[0m[31mMULT[1;31m'[0m[31m[0m [32mthen[0m reg_val *= stack.pop
+    [1;34m14[0m:       [32mwhen[0m [31m[1;31m'[0m[31mDIV[1;31m'[0m[31m[0m [32mthen[0m reg_Val /= stack.pop
+    [1;34m15[0m:       [32mwhen[0m [31m[1;31m'[0m[31mMOD[1;31m'[0m[31m[0m [32mthen[0m reg_val %= stack.pop
+    [1;34m16[0m:       [32mwhen[0m [31m[1;31m'[0m[31mPOP[1;31m'[0m[31m[0m [32mthen[0m reg_val = stack.pop
+    [1;34m17[0m:       [32mwhen[0m [31m[1;31m'[0m[31mPRINT[1;31m'[0m[31m[0m [32mthen[0m puts reg_val
+    [1;34m18[0m:       [32mwhen[0m [31m[1;31m'[0m[31mP[1;31m'[0m[31m[0m [32mthen[0m p stack
+    [1;34m19[0m:       [32melse[0m reg_val = cmd
+    [1;34m20[0m:       [32mend[0m
+    [1;34m21[0m:   [32mend[0m
+    [1;34m22[0m: [32mend[0m
+

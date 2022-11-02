@@ -1,0 +1,51 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <p> TESTING</p>
+  </body>
+  <script>
+    // retrieves all the schdules that are available. If one or more sschedules are available
+    // tally the count of schedules for each staff and alert the user of a result as a key val
+    // pair
+    // e.g staff
+
+    /*
+    keep in mind the server has been known to slow down when there are more than 7 schedules to retrieve
+    //
+    */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let msg = document.querySelector('p');
+      let req = new XMLHttpRequest();
+      req.open('GET', '/api/schedules');
+      req.responseType = 'json';
+      req.timeout = 5000
+
+      function retrieveSchedules() {
+        let schedules = req.response;
+        let staff = {};
+
+        if (schedules.length > 1) {
+          schedules.forEach(({staff_id}) => {
+            let id = `staff ${staff_id}`
+            staff[id] = staff[id] ? staff[id] + 1 : 1;
+          })
+
+          alert(Object.entries(staff).map(a => a.join(': ')).join('\n'))
+        } else {
+          alert('There are no schedules available');
+        }
+      }
+
+      req.addEventListener('load', retrieveSchedules);
+      req.addEventListener('timeout', e => alert('Request failed, please try again later'));
+      req.addEventListener('loadend', e => alert('REQUEST COMPLETED'));
+      req.send();
+// staff 1: 3, staff2: 2, staff3: 4
+
+    });
+
+
+  </script>
+</html>
